@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func normaliseURL(u string) (string, error) {
+func NormaliseURL(u string) (string, error) {
 	// Parse the URL and remove useless stuff
 	pu, err := url.Parse(u)
 	if err != nil {

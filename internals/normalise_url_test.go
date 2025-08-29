@@ -10,23 +10,23 @@ import (
 func TestNormaliseURL(t *testing.T) {
 	fmt.Println("Testing Normalise URL")
 	url := "https://blog.boot.dev/path/"
-	normUrl, err := normaliseURL(url)
+	normUrl, err := NormaliseURL(url)
 	assert.NoError(t, err)
 	assert.Equal(t, normUrl, "blog.boot.dev/path")
 
 	url = "https://blog.boot.dev/path"
-	normUrl, err = normaliseURL(url)
+	normUrl, err = NormaliseURL(url)
 	assert.NoError(t, err)
 	assert.Equal(t, normUrl, "blog.boot.dev/path")
 
 	url = "http://blog.boot.dev/path/"
-	normUrl, err = normaliseURL(url)
+	normUrl, err = NormaliseURL(url)
 	assert.NoError(t, err)
 	assert.Equal(t, normUrl, "blog.boot.dev/path")
 
 
 	url = "http://blog.boot.dev/path"
-	normUrl, err = normaliseURL(url)
+	normUrl, err = NormaliseURL(url)
 	assert.NoError(t, err)
 	assert.Equal(t, normUrl, "blog.boot.dev/path")
 }
