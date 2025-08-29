@@ -13,14 +13,14 @@ func TestURLLinkExtraction(t *testing.T) {
 	buf, err := os.ReadFile("../htmls/test_html1.html")
 	require.NoError(t, err)
 	r := bytes.NewReader(buf)
-	urls, err := getURLsFromHTML(r, "https://blog.boot.dev")
+	urls, err := GetURLsFromHTML(r, "https://blog.boot.dev")
 	require.NoError(t, err)
 	assert.Equal(t, []string{"https://blog.boot.dev/path/one", "https://other.com/path/one"}, urls)
 
 	buf, err = os.ReadFile("../htmls/test_html2.html")
 	require.NoError(t, err)
 	r = bytes.NewReader(buf)
-	urls, err = getURLsFromHTML(r, "https://blog.boot.dev")
+	urls, err = GetURLsFromHTML(r, "https://blog.boot.dev")
 	require.NoError(t, err)
 	assert.Equal(t, []string{
 		"https://blog.boot.dev/home",
@@ -31,7 +31,7 @@ func TestURLLinkExtraction(t *testing.T) {
 	buf, err = os.ReadFile("../htmls/test_html3.html")
 	require.NoError(t, err)
 	r = bytes.NewReader(buf)
-	urls, err = getURLsFromHTML(r, "https://blog.boot.dev")
+	urls, err = GetURLsFromHTML(r, "https://blog.boot.dev")
 	require.NoError(t, err)
 	assert.Equal(t, []string{
 		"https://example.com",
@@ -42,7 +42,7 @@ func TestURLLinkExtraction(t *testing.T) {
 	buf, err = os.ReadFile("../htmls/test_html4.html")
 	require.NoError(t, err)
 	r = bytes.NewReader(buf)
-	urls, err = getURLsFromHTML(r, "https://blog.boot.dev")
+	urls, err = GetURLsFromHTML(r, "https://blog.boot.dev")
 	require.NoError(t, err)
 	assert.Equal(t, []string{
 		"https://blog.boot.dev/profile?id=123",
@@ -53,7 +53,7 @@ func TestURLLinkExtraction(t *testing.T) {
 	buf, err = os.ReadFile("../htmls/test_html5.html")
 	require.NoError(t, err)
 	r = bytes.NewReader(buf)
-	urls, err = getURLsFromHTML(r, "https://blog.boot.dev")
+	urls, err = GetURLsFromHTML(r, "https://blog.boot.dev")
 	require.NoError(t, err)
 	assert.Equal(t, []string{
 		"https://blog.boot.dev/blog",
@@ -64,7 +64,7 @@ func TestURLLinkExtraction(t *testing.T) {
 	buf, err = os.ReadFile("../htmls/test_html6.html")
 	require.NoError(t, err)
 	r = bytes.NewReader(buf)
-	urls, err = getURLsFromHTML(r, "https://blog.boot.dev")
+	urls, err = GetURLsFromHTML(r, "https://blog.boot.dev")
 	require.NoError(t, err)
 	assert.Equal(t, []string{}, urls)
 

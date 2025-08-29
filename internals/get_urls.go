@@ -10,7 +10,7 @@ import (
 )
 
 
-func getURLsFromHTML(r io.Reader, baseURL string) ([]string, error) {
+func GetURLsFromHTML(r io.Reader, baseURL string) ([]string, error) {
 	htmlNode, err := html.Parse(r)
 	if err != nil {
 		return make([]string, 0), err
