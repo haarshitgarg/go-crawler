@@ -6,13 +6,15 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"sort"
+	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/haarshitgarg/go-crawler.git/internals"
 )
 
 func crawlPage(rawBaseURL string, rawCurrURL string, pages map[string]int) {
-	fmt.Printf("Crawling page: %s\n", rawCurrURL)
 	nCurrURL, err := internals.NormaliseURL(rawCurrURL)
 	if err != nil {
 		fmt.Printf("Encountered a URL that is not correct. Check it. URL: %s", rawCurrURL)
@@ -53,7 +55,6 @@ func crawlPage(rawBaseURL string, rawCurrURL string, pages map[string]int) {
 		return
 	}
 
-	fmt.Printf("Getting more URLs for the page %s\n", nCurrURL)
 	urls, err := internals.GetURLsFromHTML(htmlBody, rawBaseURL)
 	htmlBody.Close()
 	for _, url := range urls {
@@ -82,22 +83,72 @@ func getHtml(baseURL string) (io.ReadCloser, error) {
 	return res.Body, nil
 }
 
+func printReport(pages map[string]int, baseURL string) {
+	type kv struct {
+		key string
+		value int 
+	}
+	var kvSlice []kv 
+	for k, v := range pages {
+		kvSlice = append(kvSlice, kv{key: k, value: v})
+	}
+
+	sort.Slice(kvSlice, func(i, j int) bool {
+		return kvSlice[i].value < kvSlice[j].value
+	})
+
+	fmt.Println("=============================")
+  	fmt.Printf("REPORT for %s", baseURL)
+	fmt.Println("=============================")
+	for _, kv := range kvSlice {
+		fmt.Printf("Found %d internal links to %s\n", kv.value, kv.key)
+	}
+
+}
+
 func main() {
 	args := os.Args[1:]
 	if len(args) < 1 {
 		fmt.Println("no website provided")
 		os.Exit(1)
-	} else if len(args) > 1 {
+	} else if len(args) > 3 {
 		fmt.Println("too many arguments provided")
 		os.Exit(1)
 	}
-	baseURL := args[0]
-	fmt.Printf("starting crawl of: %s\n", baseURL)
+	rawBaseURL := args[0]
+	maxPage := args[1]
+	maConc := args[2]
+	nPage, err := strconv.Atoi(maxPage)
+	if err != nil {
+		fmt.Printf("The max page variable needs to be integer\n")
+		os.Exit(1)
+	}
+	nConc, err := strconv.Atoi(maConc)
+	if err != nil {
+		fmt.Printf("The max conc variable needs to be integer\n")
+		os.Exit(1)
+	}
 
+
+	baseURL, _ := url.Parse(rawBaseURL)
 	pages := make(map[string]int)
-	crawlPage(baseURL, baseURL, pages)
-	fmt.Println("======================")
-	fmt.Println(pages)
-	os.Exit(0)
+	wg := sync.WaitGroup{}
 
+	configuration := config{
+		pages: pages,
+		baseURL: *baseURL,
+		mu: &sync.Mutex{},
+		concurrencyControl: make(chan struct{}, nConc),
+		wg: &wg,
+		maxPage: nPage,
+	}
+
+	configuration.wg.Add(1)
+	go configuration.crawlPage(rawBaseURL)
+	configuration.wg.Wait()
+
+	//crawlPage(rawBaseURL, rawBaseURL, pages)
+
+	printReport(pages, rawBaseURL)
+	os.Exit(0)
 }
